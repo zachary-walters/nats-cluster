@@ -1,40 +1,67 @@
 name: nats
 
 services:
-  nats:
-    container_name: nats
-    image: 'nats:latest'
-    command: "--cluster_name NATS --cluster nats://0.0.0.0:6222"
-    hostname: nats-server
-    networks:
-      - backend
-    deploy:
-      mode: replicated
-      replicas: 1
-
   nats-1:
-    container_name: nats-1
-    image: 'nats:latest'
-    command: "--cluster_name NATS --cluster nats://0.0.0.0:6222"
-    hostname: nats-1-server
+    command:
+      - "--debug"
+      - "--cluster"
+      - "nats://0.0.0.0:6222"
+      - "--http_port"
+      - "8222"
+      - "--port"
+      - "4222"
+      - "--js"
+      - "--name=nats-1"
+      - "--cluster_name=c1"
+      - "--routes=nats-route://nats-1:6222,nats-route://nats-2:6222,nats-route://nats-3:6222"
+    image: "nats:latest"
     networks:
       - backend
-    deploy:
-      mode: replicated
-      replicas: 1
-    depends_on: ["nats"]
-
+    ports:
+      - "14222:4222"
+      - "18222:8222"
   nats-2:
-    container_name: nats-2
-    image: 'nats:latest'
-    command: "--cluster_name NATS --cluster nats://0.0.0.0:6222"
-    hostname: nats-2-server
+    command:
+      - "--debug"
+      - "--cluster"
+      - "nats://0.0.0.0:6222"
+      - "--http_port"
+      - "8222"
+      - "--port"
+      - "4222"
+      - "--routes"
+      - "nats://nats-1:6222"
+      - "--js"
+      - "--name=nats-2"
+      - "--cluster_name=c1"
+      - "--routes=nats-route://nats-1:6222,nats-route://nats-2:6222,nats-route://nats-3:6222"
+    image: "nats:latest"
     networks:
       - backend
-    deploy:
-      mode: replicated
-      replicas: 1
-    depends_on: ["nats"]
+    ports:
+      - "24222:4222"
+      - "28222:8222"
+  nats-3:
+    command:
+      - "--debug"
+      - "--cluster"
+      - "nats://0.0.0.0:6222"
+      - "--http_port"
+      - "8222"
+      - "--port"
+      - "4222"
+      - "--routes"
+      - "nats://nats-1:6222"
+      - "--js"
+      - "--name=nats-3"
+      - "--cluster_name=c1"
+      - "--routes=nats-route://nats-1:6222,nats-route://nats-2:6222,nats-route://nats-3:6222"
+    image: "nats:latest"
+    networks:
+      - backend
+    ports:
+      - "34222:4222"
+      - "38222:8222"
 
 networks:
   backend:
