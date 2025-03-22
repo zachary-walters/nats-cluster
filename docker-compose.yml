@@ -1,5 +1,3 @@
-name: nats
-
 services:
   nats-1:
     command:
